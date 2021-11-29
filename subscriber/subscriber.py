@@ -1,6 +1,3 @@
-import hashlib
-import time
-
 from numpy import random
 
 import constant
@@ -11,8 +8,10 @@ class Subscriber:
     def __init__(self, identifier):
         self.id = identifier
 
-        self.distribution = random.poisson(constant.LAMBDA / constant.SUBSCRIBERS, constant.TIME_LIMIT)
-        self.intensity = constant.LAMBDA
+        self.intensity = constant.LAMBDA / constant.SUBSCRIBERS
+        self.distribution = random.poisson(self.intensity, constant.TIME_LIMIT)
+        # self.distribution = old.poisson.poisson(self.intensity, constant.TIME_LIMIT)
+        # self.distribution = old.poisson.generate(self.intensity, constant.TIME_LIMIT)
 
         self.probability = constant.P_MAX
         self.is_transmitting = False
@@ -23,6 +22,8 @@ class Subscriber:
     def generate_new(self, slot):
         for i in range(0, self.distribution[slot]):
             self.runtime.append(Request(slot))
+
+        return self.distribution[slot]
 
     def try_transmit(self):
         if len(self.runtime) >= 1:
@@ -39,12 +40,18 @@ class Subscriber:
                 self.discard.append(self.runtime.pop(0).exit(slot))
 
             elif channel_response == constant.RESPONSE_COLL:
-                self.probability = max(self.probability / 2, constant.P_MIN)
+                self.probability = max(self.probability / constant.EXPONENT, constant.P_MIN)
 
     def get_avg_delay(self):
         tmp_sum = 0
 
-        for d in self.discard:
-            tmp_sum += d.get_delay()
+        if len(self.discard) > 0:
+            for d in self.discard:
+                tmp_sum += d.get_delay()
 
-        return tmp_sum / len(self.discard)
+            return tmp_sum / len(self.discard)
+
+        return -1
+
+    def get_processed_requests(self):
+        return len(self.discard)

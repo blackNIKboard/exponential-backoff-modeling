@@ -14,4 +14,7 @@ class Request:
         return self
 
     def get_delay(self):
+        if self.exit_slot == -1:
+            return -1
+            # print(self.exit_slot - self.entry_slot)
         return self.exit_slot - self.entry_slot
