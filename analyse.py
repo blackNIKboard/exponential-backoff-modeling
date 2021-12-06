@@ -29,7 +29,7 @@ def analyse_exponential_backoff():
 
 
 def analyse_different_exponents():
-    exponents = numpy.linspace(0.1, 7, 100)
+    exponents = numpy.linspace(1, 7, 100)
     avg_delay = []
     in_intensity = []
     out_intensity = []

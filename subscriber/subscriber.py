@@ -40,7 +40,12 @@ class Subscriber:
                 self.discard.append(self.runtime.pop(0).exit(slot))
 
             elif channel_response == constant.RESPONSE_COLL:
-                self.probability = max(self.probability / constant.EXPONENT, constant.P_MIN)
+                generated_probability = self.probability / constant.EXPONENT
+
+                if generated_probability > constant.P_MAX:
+                    generated_probability = constant.P_MAX
+
+                self.probability = max(generated_probability, constant.P_MIN)
 
     def get_avg_delay(self):
         tmp_sum = 0
